@@ -1,0 +1,45 @@
+.App {
+  margin: 0;
+  padding: 0;
+  color: white;
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+
+  .Field {
+    width: 1200px;
+    height: 1200px;
+    border: 5px solid rgb(179, 60, 60);
+    border-radius: 10px;
+
+    .SnakePosition {
+      position: absolute;
+    }
+  }
+  .Buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 20px;
+
+    button {
+      width: 100px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: red;
+      color: white;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s all;
+      text-transform: uppercase;
+      font-style: 900;
+    }
+    button:hover {
+      background: rgb(123, 10, 10);
+    }
+    button:active {
+      transform: translateY(15px);
+    }
+  }
+}
