@@ -1,109 +1,161 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./App.scss";
-import { Snake } from "./Items/Snake/Snake";
-import { Apple } from "./Items/Apple/Apple";
 
 function App() {
-  const time = 125;
-  const [flag, setFlag] = useState(false);
+  const gridSize = 20;
+  const cellSize = 30;
+  const initialSnake = [{ x: 0, y: 19 }];
+  const initialApple = { x: 10, y: 10 };
+
+  const [snake, setSnake] = useState(initialSnake);
+  const [apple, setApple] = useState(initialApple);
   const [direction, setDirection] = useState("right");
-  const [positionX, setPositionX] = useState(40);
-  const [positionY, setPositionY] = useState(600);
-  const [posAppleX, setPosAppleX] = useState(
-    Math.floor(Math.random() * 30) * 40
-  );
-  const [posAppleY, setPosAppleY] = useState(
-    Math.floor(Math.random() * 30) * 40
-  );
+  const [gameOver, setGameOver] = useState(false);
+  const [onGame, setOnGame] = useState(false);
+  const [score, setScore] = useState(1);
+  const [speed, setSpeed] = useState(300);
 
-  const StartGame = () => {
-    setFlag(true);
-  };
-  const StopGame = () => {
-    setFlag(false);
-    setPositionX(600);
-    setPositionY(600);
+  const randomPosition = () => {
+    return {
+      x: Math.floor(Math.random() * gridSize),
+      y: Math.floor(Math.random() * gridSize),
+    };
   };
 
-  const Move = () => {
-    if (direction === "right") {
-      if (positionX === 1160) {
-        setPositionX(0);
-      } else {
-        setPositionX(positionX + 40);
-      }
-    } else if (direction === "left") {
-      if (positionX === 0) {
-        setPositionX(1160);
-      } else {
-        setPositionX(positionX - 40);
-      }
-    } else if (direction === "down") {
-      if (positionY === 1160) {
-        setPositionY(0);
-      } else {
-        setPositionY(positionY + 40);
-      }
-    } else {
-      if (positionY === 0) {
-        setPositionY(1160);
-      } else {
-        setPositionY(positionY - 40);
-      }
-    }
-    if (positionX === posAppleX && positionY === posAppleY) {
-      setPosAppleX(Math.floor(Math.random() * 30) * 40);
-      setPosAppleY(Math.floor(Math.random() * 30) * 40);
-      console.log(posAppleX, posAppleY);
-    }
+  const startGame = () => {
+    setOnGame(true);
+  };
+  const stopGame = () => {
+    setOnGame(false);
   };
 
-  const handleKeyDown = (event: any) => {
-    if (flag) {
-      if (event.key === "ArrowLeft" && direction !== "right") {
-        setDirection("left");
-      } else if (event.key === "ArrowRight" && direction !== "left") {
-        setDirection("right");
-      } else if (event.key === "ArrowUp" && direction !== "down") {
+  const checkCollision = (segment: any) => {
+    return snake.some((part) => part.x === segment.x && part.y === segment.y);
+  };
+
+  const handleKeyPress = useCallback(
+    (event: any) => {
+      if (event.key === "ArrowUp" && direction !== "down") {
         setDirection("up");
       } else if (event.key === "ArrowDown" && direction !== "up") {
         setDirection("down");
+      } else if (event.key === "ArrowLeft" && direction !== "right") {
+        setDirection("left");
+      } else if (event.key === "ArrowRight" && direction !== "left") {
+        setDirection("right");
       }
-    }
-  };
+    },
+    [direction]
+  );
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    const interval = setInterval(() => {
-      if (flag) {
-        Move();
-      }
-    }, time);
+    window.addEventListener("keydown", handleKeyPress);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!gameOver && onGame) {
+        const newSnake = [...snake];
+        const head = { ...newSnake[0] };
+
+        if (direction === "up") {
+          if (head.y === 0) {
+            head.y = 19;
+          } else {
+            head.y--;
+          }
+        }
+        if (direction === "down") {
+          if (head.y === 19) {
+            head.y = 0;
+          } else {
+            head.y++;
+          }
+        }
+
+        if (direction === "left") {
+          if (head.x === 0) {
+            head.x = 19;
+          } else {
+            head.x--;
+          }
+        }
+        if (direction === "right") {
+          if (head.x === 19) {
+            head.x = 0;
+          } else {
+            head.x++;
+          }
+        }
+
+        newSnake.unshift(head);
+        if (head.x === apple.x && head.y === apple.y) {
+          setScore(score + 1);
+          if (score === 60) setGameOver(true);
+          if (score % 5 === 0 && speed !== 50) setSpeed(speed - 25);
+          console.log(score);
+          setApple(randomPosition());
+        } else {
+          newSnake.pop();
+        }
+
+        if (
+          head.x < 0 ||
+          head.x >= gridSize ||
+          head.y < 0 ||
+          head.y >= gridSize ||
+          checkCollision(head)
+        ) {
+          setGameOver(true);
+          clearInterval(interval);
+          return;
+        }
+
+        setSnake(newSnake);
+      } else {
+        clearInterval(interval);
+      }
+    }, speed);
+
+    return () => {
       clearInterval(interval);
     };
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snake, apple, direction, gameOver]);
 
   return (
     <div className="App">
-      <div className="Field">
-        <div
-          className="SnakePosition"
-          style={{ marginLeft: positionX + "px", marginTop: positionY + "px" }}
-        >
-          <Snake />
-        </div>
-        <div
-          className="ApplePosition"
-          style={{ marginLeft: posAppleX + "px", marginTop: posAppleY + "px" }}
-        >
-          <Apple />
+      <div className="MenuPanel">
+        {gameOver && <p className="game-over">Game Over</p>}
+        <h1 className="Score">Score: {score}</h1>
+        <div className="btnSection">
+          <button onClick={startGame}>Start Game</button>
+          <button onClick={stopGame}>Stop Game</button>
         </div>
       </div>
-      <div className="Buttons">
-        <button onClick={StartGame}>Start Game</button>
-        <button onClick={StopGame}>Try Again</button>
+      <div className="grid">
+        {Array.from({ length: gridSize * gridSize }).map((i, index) => {
+          const x = index % gridSize;
+          const y = Math.floor(index / gridSize);
+          const isSnake = snake.some((part) => part.x === x && part.y === y);
+          const isApple = apple.x === x && apple.y === y;
+
+          return (
+            <div
+              key={index}
+              className={`cell ${isSnake ? "snake" : ""} ${
+                isApple ? "apple" : ""
+              }`}
+              style={{
+                width: cellSize + "px",
+                height: cellSize + "px",
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

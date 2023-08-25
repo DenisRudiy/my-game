@@ -1,45 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Dosis:wght@500;800&family=Rubik:wght@400;500;700;900&display=swap");
+
 .App {
-  margin: 0;
-  padding: 0;
-  color: white;
   display: flex;
+  flex-direction: column;
+  gap: 50px;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #282c34;
+  font-family: "Dosis", sans-serif;
+  color: white;
+}
 
-  .Field {
-    width: 1200px;
-    height: 1200px;
-    border: 5px solid rgb(179, 60, 60);
-    border-radius: 10px;
-
-    .SnakePosition {
-      position: absolute;
-    }
-  }
-  .Buttons {
-    display: flex;
-    gap: 5px;
+.MenuPanel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .game-over {
+    font-size: 54px;
+    font-weight: 800;
     margin-top: 20px;
-
+    text-transform: uppercase;
+  }
+  .Score {
+    font-weight: 500;
+  }
+  .btnSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     button {
-      width: 100px;
+      width: 120px;
       height: 40px;
-      border-radius: 10px;
-      background-color: red;
-      color: white;
-      outline: none;
       border: none;
-      cursor: pointer;
-      transition: 0.2s all;
+      outline: none;
+      border-radius: 10px;
+      margin: 10px;
       text-transform: uppercase;
-      font-style: 900;
+      font-weight: 900;
+      cursor: pointer;
+      background-color: #1baf27;
+      color: white;
+      font-family: "Dosis", sans-serif;
+      transition: 0.3s all;
     }
     button:hover {
-      background: rgb(123, 10, 10);
+      background-color: #0d6715;
     }
     button:active {
-      transform: translateY(15px);
+      transform: translateY(20px);
     }
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(20, 30px);
+  grid-template-rows: repeat(20, 30px);
+  gap: 1px;
+  border: 1px solid #1baf27;
+
+  .cell {
+    background-color: #1e2229;
+  }
+
+  .snake {
+    background-color: #1baf27;
+    border-radius: 10px;
+  }
+
+  .apple {
+    // background-color: #ff6347;
+    background-image: url("https://img.icons8.com/tiny-color/64/apple.png");
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
   }
 }
